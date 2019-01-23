@@ -9,10 +9,13 @@ void updateBrakes();
 void brake();
 void fire();
 void updateCatipult();
+void updateDirection();
+void directionSwap();
 
 int driveMode = 0;
 int loaderMode = 0;
 
+bool direction = false; //False is normal
 bool brakes = false;
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -33,15 +36,9 @@ void opcontrol() {
 		fpsControl();
 		updateLoader();
 		updateBrakes();
+		updateDirection();
 		delay(20);
 	}
-}
-
-void powerDrive(int leftf, int leftb, int rightf, int rightb){
-	leftDriveF.move(leftf);
-	leftDriveR.move(leftb);
-	rightDriveF.move(rightf);
-	rightDriveR.move(rightb);
 }
 
 void fpsControl(){
@@ -74,6 +71,22 @@ void fpsControl(){
     }
 
     powerDrive(leftf, leftb, rightf, rightb);
+}
+
+void powerDrive(int leftf, int leftb, int rightf, int rightb){
+	if(!brakes){
+        if(!direction){
+					leftDriveF.move(leftf);
+					leftDriveR.move(leftb);
+					rightDriveF.move(rightf);
+					rightDriveR.move(rightb);
+        }else{
+					leftDriveF.move(rightb);
+					leftDriveR.move(rightf);
+					rightDriveF.move(leftb);
+					rightDriveR.move(leftf);
+        }
+    }
 }
 
 //Loader Stuff ----------------------------------------------------------------
@@ -156,3 +169,19 @@ void updateCatipult(){
 		}
 }
 //End Catipult Stuff ----------------------------------------------------------
+
+//Direction Swapping ----------------------------------------------------------
+void updateDirection(){
+		if(joystick.get_digital_new_press(DIGITAL_A)){
+			directionSwap();
+		}
+}
+
+void directionSwap(){
+    if(direction == true){
+        direction = false;
+    }else if(direction == false){
+        direction = true;
+    }
+}
+//End Direction Swapping -------------------------------------------------------
